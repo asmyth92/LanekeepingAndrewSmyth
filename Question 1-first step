@@ -1,0 +1,35 @@
+from scipy.integrate import solve_ivp
+import numpy as np
+import matplotlib.pyplot as plt
+#Dynamical system:
+# dz/dt = f(t, z)   ssr we need to process system dynamics in this form
+# x' = v * cos(theta)
+# y' = v * sin(theta)
+# theta' = v * tan(u) / L
+# state: z = [x, y, theta]
+# input: u
+# x and y are the xy co-ordinates of the vehicle
+# theta is the angle of the vehicle
+
+v = 5
+L = 2.3
+u = np.pi/90
+
+def dynamics(t, z):
+    x = z[0]
+    y = z[1]
+    theta = z[2]
+
+    return [v*np.cos(theta), v*np.sin(theta), v*np.tan(u)/L]
+
+t_final = 2
+z_init = [1, 0.3, np.pi/36]
+
+num_points = 1000  # resolution
+
+# Simulate the dynamical system
+solution = solve_ivp(dynamics,
+                [0, t_final],
+                z_init,
+                t_eval=np.linspace(0, t_final, num_points))
+#solves using system dynamics, then time overlapped in simulation, then initial state conditions #t_eval refers to the resolution of the solution
