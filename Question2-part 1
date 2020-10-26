@@ -1,0 +1,128 @@
+from scipy.integrate import solve_ivp
+import numpy as np
+import matplotlib.pyplot as plt
+
+class Car:
+    def __init__(self, length=2.3, velocity=5, x=0, y=0.3, pose=5 * np.pi/180):
+        self.__length = length
+        self.__velocity = velocity
+        self.__x = x
+        self.__y = y
+        self.__pose = pose
+
+
+    def move(self, steering_angle, dt):
+        #dt is period of time for which this steering angle is applied
+        #simulate the motion (trajectory of the car
+        #from time t=0 to time =0+dt
+        #z_initial = [self.x, self.y, self.pose]
+
+        def system_dynamics(t, z):
+            pose = z[2]
+            x = z[0]
+            y = z[1]
+            #equations of state
+           
+           Disturbance = np.pi / 180
+            
+            return [self.__velocity * np.cos(self.__pose), self.__velocity * np.sin(self.__pose), self.__velocity * np.tan(steering_angle + Disturbance) / self.__length]
+                                                                                                                        #disturbance of 1 degree
+        z_initial = [self.__x, self.__y, self.__pose]
+        solution = solve_ivp(system_dynamics,
+                             [0, dt],            #solve from time zero to time dt
+                             z_initial)          #initial state conditions
+
+        self.__x = solution.y[0][-1]    # storing last element of x array in self.x, ie last known position on x plane
+        self.__y = solution.y[1][-1]    # same for y
+        self.__pose = solution.y[2][-1]  # same for pose
+
+    def x(self):
+        return self.__x                  #allows self.__x to be read as it is hidden by __ so it cant be rewritten
+
+    def y(self):
+        return self.__y                  #same for y
+
+    def pose(self):
+        return self.__pose               #same for pose
+
+    def velocity(self):
+        return self.__velocity
+
+    def length(self):
+        return self.length
+
+
+class PID controller:
+
+    #Kp: proportional gain
+    #Kd: derivative gain
+    #Ki: integral gain
+    #Ts: sampling time
+
+    def __init__(self, kp, ki, kd, ts):
+        """
+        Constructor for PID controller
+        :param kp:proportional gain
+        :param ki:derivative gain
+        :param kd:integral gain
+        :param ts:sampling time
+        """
+        
+        self.__kp = kp
+        self.__ts = ts
+      
+
+    def control(self, y, y_set_point=0):
+        error = y_set_point - y
+        control_action = self.__kp * error
+
+        return control_action
+
+
+t_sampling = 0.025
+pid = PIDcontroller(kp=0.1, ki=0.7, kd=0.3, ts = t_sampling)
+murphy = Car()
+pid2 = PIDcontroller(kp=0.3, ki=0.5, kd=0.2, ts = t_sampling)
+murphy2 = Car()
+pid3 = PIDcontroller(kp=0.2, ki=0.6, kd=0.1, ts = t_sampling)
+murphy3 = Car()
+
+y_cache = np.array(murphy.y())    # we inserted the first value of y into y cache
+y_cache2 = np.array(murphy2.y())
+y_cache3 = np.array(murphy3.y())
+x_cache = np.array(murphy.x())
+x_cache2 = np.array(murphy2.x())
+x_cache3 = np.array(murphy3.x())
+
+
+num_points = 2000
+
+for k  in range(num_points):
+
+
+    control_action = pid.control(y=murphy.y())
+    murphy.move(control_action, t_sampling)
+    y_cache = np.append(y_cache, murphy.y())     #updates values of old y_cache with new murphy.y values
+    x_cache = np.append(x_cache, murphy.x())
+
+    control_action = pid2.control(y=murphy2.y())
+    murphy2.move(control_action, t_sampling)
+    y_cache2 = np.append(y_cache2, murphy2.y())      # updates values of old y_cache with new murphy.y values
+    x_cache2 = np.append(x_cache2, murphy2.x())
+
+    control_action = pid3.control(y=murphy3.y())
+    murphy3.move(control_action, t_sampling)
+    y_cache3 = np.append(y_cache3, murphy3.y())
+    x_cache3 = np.append(x_cache3, murphy3.x())
+
+#want to plot y_cache against t_sampling * [0, 1, 2......, 500]
+
+
+t_span = t_sampling * np.arange(num_points + 1)
+plt.plot(x_cache, y_cache, 'r')
+plt.plot(x_cache2, y_cache2, 'b')
+plt.plot(x_cache3, y_cache3, 'g')
+plt.xlabel("x value (m)")
+plt.ylabel("y value (m)")
+plt.grid()
+plt.show()
