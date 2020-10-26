@@ -1,0 +1,24 @@
+times = solution.t
+x_trajectory = solution.y[0]      #first array in solution for y
+y_trajectory = solution.y[1]      #second array
+theta_trajectory = solution.y[2]  #third array
+
+plt.plot(times, x_trajectory)
+plt.xlabel("time (s)")
+plt.ylabel("lateral position x(t)")   #graph of x against time
+plt.show()
+
+plt.plot(times, y_trajectory)
+plt.xlabel("time (s)")
+plt.ylabel("vertical position y(t)")#graph of y against time
+plt.show()
+
+plt.plot(times, theta_trajectory)
+plt.xlabel("time (s)")
+plt.ylabel("angle theta(t)")      #graph of theta against time
+plt.show()
+
+plt.plot(x_trajectory, y_trajectory)      #graph of x-y plane
+plt.xlabel("x trajectory")
+plt.ylabel("y trajectory") 
+plt.show()
