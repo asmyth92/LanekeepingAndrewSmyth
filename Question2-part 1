@@ -80,11 +80,11 @@ class PID controller:
 
 
 t_sampling = 0.025
-pid = PIDcontroller(kp=0.1, ki=0.7, kd=0.3, ts = t_sampling)
+pid = PIDcontroller(kp=0.03, ki=0.0, kd=0.0, ts = t_sampling)
 murphy = Car()
-pid2 = PIDcontroller(kp=0.3, ki=0.5, kd=0.2, ts = t_sampling)
+pid2 = PIDcontroller(kp=0.1, ki=0.0, kd=0.0, ts = t_sampling)
 murphy2 = Car()
-pid3 = PIDcontroller(kp=0.2, ki=0.6, kd=0.1, ts = t_sampling)
+pid3 = PIDcontroller(kp=0.7, ki=0.0, kd=0.0, ts = t_sampling)
 murphy3 = Car()
 
 y_cache = np.array(murphy.y())    # we inserted the first value of y into y cache
